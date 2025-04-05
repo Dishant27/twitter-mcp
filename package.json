@@ -1,0 +1,39 @@
+{
+  "name": "twitter-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server for Twitter integration",
+  "main": "dist/index.js",
+  "bin": {
+    "twitter-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "twitter",
+    "api",
+    "model",
+    "context",
+    "protocol"
+  ],
+  "author": "Dishant27",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.2.0",
+    "dotenv": "^16.4.5",
+    "twitter-api-v2": "^1.16.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
