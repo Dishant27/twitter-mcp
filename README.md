@@ -31,6 +31,33 @@ npm start
 
 6. Use with a MCP client, such as Claude.
 
+## Claude Configuration
+
+To use this server with Claude, you'll need to set up the MCP configuration. Here's an example of how the configuration structure should look:
+
+```json
+{
+  "name": "twitter",
+  "display_name": "Twitter",
+  "description": "Twitter MCP allows Claude to post tweets and search Twitter",
+  "path": "path/to/twitter-mcp/dist/index.js",
+  "startup": {
+    "env": {
+      "TWITTER_API_KEY": "your_twitter_api_key",
+      "TWITTER_API_SECRET": "your_twitter_api_secret",
+      "TWITTER_ACCESS_TOKEN": "your_twitter_access_token",
+      "TWITTER_ACCESS_TOKEN_SECRET": "your_twitter_access_token_secret"
+    }
+  },
+  "transport": "stdio"
+}
+```
+
+Save this configuration in your Claude MCP config directory, typically located at:
+- Windows: `%APPDATA%\AnthropicClaude\mcp-servers`
+- macOS: `~/Library/Application Support/AnthropicClaude/mcp-servers`
+- Linux: `~/.config/AnthropicClaude/mcp-servers`
+
 ## Features
 
 - Post tweets with text
@@ -49,6 +76,28 @@ npm start
 | `TWITTER_API_SECRET` | Your Twitter API secret |
 | `TWITTER_ACCESS_TOKEN` | Your Twitter access token |
 | `TWITTER_ACCESS_TOKEN_SECRET` | Your Twitter access token secret |
+
+## Repository Structure
+
+```
+twitter-mcp/
+├── .github/
+│   └── workflows/
+│       ├── publish.yml
+│       └── release.yml
+├── src/
+│   ├── index.ts        # Main entry point
+│   ├── twitter-api.ts  # Twitter API client
+│   ├── formatter.ts    # Response formatter
+│   └── types.ts        # Type definitions
+├── .env.example
+├── .gitignore
+├── Dockerfile
+├── LICENSE
+├── package.json
+├── README.md
+└── tsconfig.json
+```
 
 ## License
 
