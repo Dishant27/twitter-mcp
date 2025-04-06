@@ -1,4 +1,4 @@
-# Twitter MCP Server
+# <img src="https://abs.twimg.com/responsive-web/web/icon-ios.8ea219d4.png" alt="Twitter Logo" width="32" height="32"> Twitter MCP Server
 
 This MCP server allows Clients to interact with Twitter, enabling comprehensive Twitter operations including posting tweets, searching Twitter, managing accounts, and organizing lists.
 
