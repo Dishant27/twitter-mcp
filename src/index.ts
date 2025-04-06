@@ -1,1 +1,603 @@
-IyEvdXNyL2Jpbi9lbnYgbm9kZQppbXBvcnQgeyBTZXJ2ZXIgfSBmcm9tICdAbW9kZWxjb250ZXh0cHJvdG9jb2wvc2RrL3NlcnZlci9pbmRleC5qcyc7CmltcG9ydCB7IFN0ZGlvU2VydmVyVHJhbnNwb3J0IH0gZnJvbSAnQG1vZGVsY29udGV4dHByb3RvY29sL3Nkay9zZXJ2ZXIvc3RkaW8uanMnOwppbXBvcnQgewogIExpc3RUb29sc1JlcXVlc3RTY2hlbWEsCiAgQ2FsbFRvb2xSZXF1ZXN0U2NoZW1hLAogIFRvb2wsCiAgRXJyb3JDb2RlLAogIE1jcEVycm9yLAogIFRleHRDb250ZW50Cn0gZnJvbSAnQG1vZGVsY29udGV4dHByb3RvY29sL3Nkay90eXBlcy5qcyc7CmltcG9ydCB7IFR3aXR0ZXJDbGllbnQgfSBmcm9tICcuL3R3aXR0ZXItYXBpLmpzJzsKaW1wb3J0IHsgUmVzcG9uc2VGb3JtYXR0ZXIgfSBmcm9tICcuL2Zvcm1hdHRlci5qcyc7CmltcG9ydCB7CiAgQ29uZmlnLCBDb25maWdTY2hlbWEsCiAgUG9zdFR3ZWV0U2NoZW1hLCBTZWFyY2hUd2VldHNTY2hlbWEsCiAgVHdpdHRlckVycm9yCn0gZnJvbSAnLi90eXBlcy5qcyc7CmltcG9ydCBkb3RlbnYgZnJvbSAnZG90ZW52JzsKCmV4cG9ydCBjbGFzcyBUd2l0dGVyU2VydmVyIHsKICBwcml2YXRlIHNlcnZlcjogU2VydmVyOwogIHByaXZhdGUgY2xpZW50OiBUd2l0dGVyQ2xpZW50OwoKICBjb25zdHJ1Y3Rvcihjb25maWc6IENvbmZpZykgewogICAgLy8gVmFsaWRhdGUgY29uZmlnCiAgICBjb25zdCByZXN1bHQgPSBDb25maWdTY2hlbWEuc2FmZVBhcnNlKGNvbmZpZyk7CiAgICBpZiAoIXJlc3VsdC5zdWNjZXNzKSB7CiAgICAgIHRocm93IG5ldyBFcnJvcihgSW52YWxpZCBjb25maWd1cmF0aW9uOiAke3Jlc3VsdC5lcnJvci5tZXNzYWdlfWApOwogICAgfQoKICAgIHRoaXMuY2xpZW50ID0gbmV3IFR3aXR0ZXJDbGllbnQoY29uZmlnKTsKICAgIHRoaXMuc2VydmVyID0gbmV3IFNlcnZlcih7CiAgICAgIG5hbWU6ICd0d2l0dGVyLW1jcCcsCiAgICAgIHZlcnNpb246ICcxLjAuMCcKICAgIH0sIHsKICAgICAgY2FwYWJpbGl0aWVzOiB7CiAgICAgICAgdG9vbHM6IHt9CiAgICAgIH0KICAgIH0pOwoKICAgIHRoaXMuc2V0dXBIYW5kbGVycygpOwogIH0KCiAgcHJpdmF0ZSBzZXR1cEhhbmRsZXJzKCk6IHZvaWQgewogICAgLy8gRXJyb3IgaGFuZGxlcgogICAgdGhpcy5zZXJ2ZXIub25lcnJvciA9IChlcnJvcikgPT4gewogICAgICBjb25zb2xlLmVycm9yKCdbTUNQIEVycm9yXTonLCBlcnJvcik7CiAgICB9OwoKICAgIC8vIEdyYWNlZnVsIHNodXRkb3duCiAgICBwcm9jZXNzLm9uKCdTSUdJTlQnLCBhc3luYyAoKSA9PiB7CiAgICAgIGNvbnNvbGUuZXJyb3IoJ1NodXR0aW5nIGRvd24gc2VydmVyLi4uJyk7CiAgICAgIGF3YWl0IHRoaXMuc2VydmVyLmNsb3NlKCk7CiAgICAgIHByb2Nlc3MuZXhpdCgwKTsKICAgIH0pOwoKICAgIC8vIFJlZ2lzdGVyIHRvb2wgaGFuZGxlcnMKICAgIHRoaXMuc2V0dXBUb29sSGFuZGxlcnMoKTsKICB9CgogIHByaXZhdGUgc2V0dXBUb29sSGFuZGxlcnMoKTogdm9pZCB7CiAgICAvLyBMaXN0IGF2YWlsYWJsZSB0b29scwogICAgdGhpcy5zZXJ2ZXIuc2V0UmVxdWVzdEhhbmRsZXIoTGlzdFRvb2xzUmVxdWVzdFNjaGVtYSwgYXN5bmMgKCkgPT4gKHsKICAgICAgdG9vbHM6IFsKICAgICAgICB7CiAgICAgICAgICBuYW1lOiAncG9zdF90d2VldCcsCiAgICAgICAgICBkZXNjcmlwdGlvbjogJ1Bvc3QgYSBuZXcgdHdlZXQgdG8gVHdpdHRlcicsCiAgICAgICAgICBpbnB1dFNjaGVtYTogewogICAgICAgICAgICB0eXBlOiAnb2JqZWN0JywKICAgICAgICAgICAgcHJvcGVydGllczogewogICAgICAgICAgICAgIHRleHQ6IHsKICAgICAgICAgICAgICAgIHR5cGU6ICdzdHJpbmcnLAogICAgICAgICAgICAgICAgZGVzY3JpcHRpb246ICdUaGUgY29udGVudCBvZiB5b3VyIHR3ZWV0JywKICAgICAgICAgICAgICAgIG1heExlbmd0aDogMjgwCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9LAogICAgICAgICAgICByZXF1aXJlZDogWyd0ZXh0J10KICAgICAgICAgIH0KICAgICAgICB9IGFzIFRvb2wsCiAgICAgICAgewogICAgICAgICAgbmFtZTogJ3NlYXJjaF90d2VldHMnLAogICAgICAgICAgZGVzY3JpcHRpb246ICdTZWFyY2ggZm9yIHR3ZWV0cyBvbiBUd2l0dGVyJywKICAgICAgICAgIGlucHV0U2NoZW1hOiB7CiAgICAgICAgICAgIHR5cGU6ICdvYmplY3QnLAogICAgICAgICAgICBwcm9wZXJ0aWVzOiB7CiAgICAgICAgICAgICAgcXVlcnk6IHsKICAgICAgICAgICAgICAgIHR5cGU6ICdzdHJpbmcnLAogICAgICAgICAgICAgICAgZGVzY3JpcHRpb246ICdTZWFyY2ggcXVlcnknCiAgICAgICAgICAgICAgfSwKICAgICAgICAgICAgICBjb3VudDogewogICAgICAgICAgICAgICAgdHlwZTogJ251bWJlcicsCiAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbjogJ051bWJlciBvZiB0d2VldHMgdG8gcmV0dXJuICgxMC0xMDApJywKICAgICAgICAgICAgICAgIG1pbmltdW06IDEwLAogICAgICAgICAgICAgICAgbWF4aW11bTogMTAwCiAgICAgICAgICAgICAgfQogICAgICAgICAgICB9LAogICAgICAgICAgICByZXF1aXJlZDogWydxdWVyeScsICdjb3VudCddCiAgICAgICAgICB9CiAgICAgICAgfSBhcyBUb29sCiAgICAgIF0KICAgIH0pKTsKCiAgICAvLyBIYW5kbGUgdG9vbCBleGVjdXRpb24KICAgIHRoaXMuc2VydmVyLnNldFJlcXVlc3RIYW5kbGVyKENhbGxUb29sUmVxdWVzdFNjaGVtYSwgYXN5bmMgKHJlcXVlc3QpID0+IHsKICAgICAgY29uc3QgeyBuYW1lLCBhcmd1bWVudHM6IGFyZ3MgfSA9IHJlcXVlc3QucGFyYW1zOwogICAgICBjb25zb2xlLmVycm9yKGBUb29sIGNhbGxlZDogJHtuYW1lfWAsIGFyZ3MpOwoKICAgICAgdHJ5IHsKICAgICAgICBzd2l0Y2ggKG5hbWUpIHsKICAgICAgICAgIGNhc2UgJ3Bvc3RfdHdlZXQnOgogICAgICAgICAgICByZXR1cm4gYXdhaXQgdGhpcy5oYW5kbGVQb3N0VHdlZXQoYXJncyk7CiAgICAgICAgICBjYXNlICdzZWFyY2hfdHdlZXRzJzoKICAgICAgICAgICAgcmV0dXJuIGF3YWl0IHRoaXMuaGFuZGxlU2VhcmNoVHdlZXRzKGFyZ3MpOwogICAgICAgICAgZGVmYXVsdDoKICAgICAgICAgICAgdGhyb3cgbmV3IE1jcEVycm9yKAogICAgICAgICAgICAgIEVycm9yQ29kZS5NZXRob2ROb3RGb3VuZCwKICAgICAgICAgICAgICBgVW5rbm93biB0b29sOiAke25hbWV9YAogICAgICAgICAgICApOwogICAgICAgIH0KICAgICAgfSBjYXRjaCAoZXJyb3IpIHsKICAgICAgICByZXR1cm4gdGhpcy5oYW5kbGVFcnJvcihlcnJvcik7CiAgICAgIH0KICAgIH0pOwogIH0KCiAgcHJpdmF0ZSBhc3luYyBoYW5kbGVQb3N0VHdlZXQoYXJnczogdW5rbm93bikgewogICAgY29uc3QgcmVzdWx0ID0gUG9zdFR3ZWV0U2NoZW1hLnNhZmVQYXJzZShhcmdzKTsKICAgIGlmICghcmVzdWx0LnN1Y2Nlc3MpIHsKICAgICAgdGhyb3cgbmV3IE1jcEVycm9yKAogICAgICAgIEVycm9yQ29kZS5JbnZhbGlkUGFyYW1zLAogICAgICAgIGBJbnZhbGlkIHBhcmFtZXRlcnM6ICR7cmVzdWx0LmVycm9yLm1lc3NhZ2V9YAogICAgICApOwogICAgfQoKICAgIGNvbnN0IHR3ZWV0ID0gYXdhaXQgdGhpcy5jbGllbnQucG9zdFR3ZWV0KHJlc3VsdC5kYXRhLnRleHQpOwogICAgcmV0dXJuIHsKICAgICAgY29udGVudDogW3sKICAgICAgICB0eXBlOiAndGV4dCcsCiAgICAgICAgdGV4dDogYFR3ZWV0IHBvc3RlZCBzdWNjZXNzZnVsbHkhXG5VUkw6IGh0dHBzOi8vdHdpdHRlci5jb20vc3RhdHVzLyR7dHdlZXQuaWR9YAogICAgICB9XSBhcyBUZXh0Q29udGVudFtdCiAgICB9OwogIH0KCiAgcHJpdmF0ZSBhc3luYyBoYW5kbGVTZWFyY2hUd2VldHMoYXJnczogdW5rbm93bikgewogICAgY29uc3QgcmVzdWx0ID0gU2VhcmNoVHdlZXRzU2NoZW1hLnNhZmVQYXJzZShhcmdzKTsKICAgIGlmICghcmVzdWx0LnN1Y2Nlc3MpIHsKICAgICAgdGhyb3cgbmV3IE1jcEVycm9yKAogICAgICAgIEVycm9yQ29kZS5JbnZhbGlkUGFyYW1zLAogICAgICAgIGBJbnZhbGlkIHBhcmFtZXRlcnM6ICR7cmVzdWx0LmVycm9yLm1lc3NhZ2V9YAogICAgICApOwogICAgfQoKICAgIGNvbnN0IHsgdHdlZXRzLCB1c2VycyB9ID0gYXdhaXQgdGhpcy5jbGllbnQuc2VhcmNoVHdlZXRzKAogICAgICByZXN1bHQuZGF0YS5xdWVyeSwKICAgICAgcmVzdWx0LmRhdGEuY291bnQKICAgICk7CgogICAgY29uc3QgZm9ybWF0dGVkUmVzcG9uc2UgPSBSZXNwb25zZUZvcm1hdHRlci5mb3JtYXRTZWFyY2hSZXNwb25zZSgKICAgICAgcmVzdWx0LmRhdGEucXVlcnksCiAgICAgIHR3ZWV0cywKICAgICAgdXNlcnMKICAgICk7CgogICAgcmV0dXJuIHsKICAgICAgY29udGVudDogW3sKICAgICAgICB0eXBlOiAndGV4dCcsCiAgICAgICAgdGV4dDogUmVzcG9uc2VGb3JtYXR0ZXIudG9NY3BSZXNwb25zZShmb3JtYXR0ZWRSZXNwb25zZSkKICAgICAgfV0gYXMgVGV4dENvbnRlbnRbXQogICAgfTsKICB9CgogIHByaXZhdGUgaGFuZGxlRXJyb3IoZXJyb3I6IHVua25vd24pIHsKICAgIGlmIChlcnJvciBpbnN0YW5jZW9mIE1jcEVycm9yKSB7CiAgICAgIHRocm93IGVycm9yOwogICAgfQoKICAgIGlmIChlcnJvciBpbnN0YW5jZW9mIFR3aXR0ZXJFcnJvcikgewogICAgICBpZiAoVHdpdHRlckVycm9yLmlzUmF0ZUxpbWl0KGVycm9yKSkgewogICAgICAgIHJldHVybiB7CiAgICAgICAgICBjb250ZW50OiBbewogICAgICAgICAgICB0eXBlOiAndGV4dCcsCiAgICAgICAgICAgIHRleHQ6ICdSYXRlIGxpbWl0IGV4Y2VlZGVkLiBQbGVhc2Ugd2FpdCBhIG1vbWVudCBiZWZvcmUgdHJ5aW5nIGFnYWluLicsCiAgICAgICAgICAgIGlzRXJyb3I6IHRydWUKICAgICAgICAgIH1dIGFzIFRleHRDb250ZW50W10KICAgICAgICB9OwogICAgICB9CgogICAgICByZXR1cm4gewogICAgICAgIGNvbnRlbnQ6IFt7CiAgICAgICAgICB0eXBlOiAndGV4dCcsCiAgICAgICAgICB0ZXh0OiBgVHdpdHRlciBBUEkgZXJyb3I6ICR7KGVycm9yIGFzIFR3aXR0ZXJFcnJvcikubWVzc2FnZX1gLAogICAgICAgICAgaXNFcnJvcjogdHJ1ZQogICAgICAgIH1dIGFzIFRleHRDb250ZW50W10KICAgICAgfTsKICAgIH0KCiAgICBjb25zb2xlLmVycm9yKCdVbmV4cGVjdGVkIGVycm9yOicsIGVycm9yKTsKICAgIHRocm93IG5ldyBNY3BFcnJvcigKICAgICAgRXJyb3JDb2RlLkludGVybmFsRXJyb3IsCiAgICAgICdBbiB1bmV4cGVjdGVkIGVycm9yIG9jY3VycmVkJwogICAgKTsKICB9CgogIGFzeW5jIHN0YXJ0KCk6IFByb21pc2U8dm9pZD4gewogICAgY29uc3QgdHJhbnNwb3J0ID0gbmV3IFN0ZGlvU2VydmVyVHJhbnNwb3J0KCk7CiAgICBhd2FpdCB0aGlzLnNlcnZlci5jb25uZWN0KHRyYW5zcG9ydCk7CiAgICBjb25zb2xlLmVycm9yKCdUd2l0dGVyIE1DUCBzZXJ2ZXIgcnVubmluZyBvbiBzdGRpbycpOwogIH0KfQoKLy8gU3RhcnQgdGhlIHNlcnZlcgpkb3RlbnYuY29uZmlnKCk7Cgpjb25zdCBjb25maWcgPSB7CiAgYXBpS2V5OiBwcm9jZXNzLmVudi5UV0lUVEVSX0FQSV9LRVkhLAogIGFwaVNlY3JldEtleTogcHJvY2Vzcy5lbnYuVFdJVFRFUl9BUElfU0VDUkVUISwKICBhY2Nlc3NUb2tlbjogcHJvY2Vzcy5lbnYuVFdJVFRFUl9BQ0NFU1NfVE9LRU4hLAogIGFjY2Vzc1Rva2VuU2VjcmV0OiBwcm9jZXNzLmVudi5UV0lUVEVSX0FDQ0VTU19UT0tFTl9TRUNSRVQhCn07Cgpjb25zdCBzZXJ2ZXIgPSBuZXcgVHdpdHRlclNlcnZlcihjb25maWcpOwpzZXJ2ZXIuc3RhcnQoKS5jYXRjaChlcnJvciA9PiB7CiAgY29uc29sZS5lcnJvcignRmFpbGVkIHRvIHN0YXJ0IHNlcnZlcjonLCBlcnJvcik7CiAgcHJvY2Vzcy5leGl0KDEpOwp9KTs=
+#!/usr/bin/env node
+import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import {
+  ListToolsRequestSchema,
+  CallToolRequestSchema,
+  Tool,
+  ErrorCode,
+  McpError,
+  TextContent
+} from '@modelcontextprotocol/sdk/types.js';
+import { TwitterClient } from './twitter-api.js';
+import { ResponseFormatter } from './formatter.js';
+import {
+  Config, ConfigSchema,
+  PostTweetSchema, SearchTweetsSchema,
+  GetProfileSchema, UpdateProfileSchema,
+  FollowUserSchema, UnfollowUserSchema,
+  ListFollowersSchema, ListFollowingSchema,
+  CreateListSchema, ListInfoSchema,
+  TwitterError
+} from './types.js';
+import dotenv from 'dotenv';
+
+export class TwitterServer {
+  private server: Server;
+  private client: TwitterClient;
+
+  constructor(config: Config) {
+    // Validate config
+    const result = ConfigSchema.safeParse(config);
+    if (!result.success) {
+      throw new Error(`Invalid configuration: ${result.error.message}`);
+    }
+
+    this.client = new TwitterClient(config);
+    this.server = new Server({
+      name: 'twitter-mcp',
+      version: '1.0.0'
+    }, {
+      capabilities: {
+        tools: {}
+      }
+    });
+
+    this.setupHandlers();
+  }
+
+  private setupHandlers(): void {
+    // Error handler
+    this.server.onerror = (error) => {
+      console.error('[MCP Error]:', error);
+    };
+
+    // Graceful shutdown
+    process.on('SIGINT', async () => {
+      console.error('Shutting down server...');
+      await this.server.close();
+      process.exit(0);
+    });
+
+    // Register tool handlers
+    this.setupToolHandlers();
+  }
+
+  private setupToolHandlers(): void {
+    // List available tools
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+      tools: [
+        // Tweet operations
+        {
+          name: 'post_tweet',
+          description: 'Post a new tweet to Twitter',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              text: {
+                type: 'string',
+                description: 'The content of your tweet',
+                maxLength: 280
+              }
+            },
+            required: ['text']
+          }
+        } as Tool,
+        {
+          name: 'search_tweets',
+          description: 'Search for tweets on Twitter',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              query: {
+                type: 'string',
+                description: 'Search query'
+              },
+              count: {
+                type: 'number',
+                description: 'Number of tweets to return (10-100)',
+                minimum: 10,
+                maximum: 100
+              }
+            },
+            required: ['query', 'count']
+          }
+        } as Tool,
+        
+        // Account management operations
+        {
+          name: 'get_profile',
+          description: 'Get Twitter profile information for a user or the authenticated account',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              username: {
+                type: 'string',
+                description: 'Twitter username (if not provided, returns authenticated user profile)'
+              }
+            },
+            required: []
+          }
+        } as Tool,
+        {
+          name: 'update_profile',
+          description: 'Update the authenticated user\'s Twitter profile',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+                description: 'Display name (max 50 chars)'
+              },
+              description: {
+                type: 'string',
+                description: 'Bio (max 160 chars)'
+              },
+              location: {
+                type: 'string',
+                description: 'Location (max 30 chars)'
+              },
+              url: {
+                type: 'string',
+                description: 'Website URL (max 100 chars)'
+              }
+            },
+            required: []
+          }
+        } as Tool,
+        {
+          name: 'follow_user',
+          description: 'Follow a Twitter user',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              username: {
+                type: 'string',
+                description: 'Twitter username to follow'
+              }
+            },
+            required: ['username']
+          }
+        } as Tool,
+        {
+          name: 'unfollow_user',
+          description: 'Unfollow a Twitter user',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              username: {
+                type: 'string',
+                description: 'Twitter username to unfollow'
+              }
+            },
+            required: ['username']
+          }
+        } as Tool,
+        {
+          name: 'list_followers',
+          description: 'List followers of a Twitter user or the authenticated account',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              username: {
+                type: 'string',
+                description: 'Twitter username (if not provided, returns authenticated user\'s followers)'
+              },
+              count: {
+                type: 'number',
+                description: 'Number of followers to return (1-200)',
+                minimum: 1,
+                maximum: 200,
+                default: 20
+              }
+            },
+            required: []
+          }
+        } as Tool,
+        {
+          name: 'list_following',
+          description: 'List accounts that a Twitter user or the authenticated account is following',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              username: {
+                type: 'string',
+                description: 'Twitter username (if not provided, returns authenticated user\'s following)'
+              },
+              count: {
+                type: 'number',
+                description: 'Number of accounts to return (1-200)',
+                minimum: 1,
+                maximum: 200,
+                default: 20
+              }
+            },
+            required: []
+          }
+        } as Tool,
+        {
+          name: 'create_list',
+          description: 'Create a new Twitter list',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+                description: 'List name (max 25 chars)'
+              },
+              description: {
+                type: 'string',
+                description: 'List description (max 100 chars)'
+              },
+              private: {
+                type: 'boolean',
+                description: 'Whether the list should be private (default: false)'
+              }
+            },
+            required: ['name']
+          }
+        } as Tool,
+        {
+          name: 'get_list_info',
+          description: 'Get information about a Twitter list',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              listId: {
+                type: 'string',
+                description: 'Twitter list ID'
+              }
+            },
+            required: ['listId']
+          }
+        } as Tool,
+        {
+          name: 'get_user_lists',
+          description: 'Get all lists owned by the authenticated user',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+            required: []
+          }
+        } as Tool
+      ]
+    }));
+
+    // Handle tool execution
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+      console.error(`Tool called: ${name}`, args);
+
+      try {
+        switch (name) {
+          // Tweet operations
+          case 'post_tweet':
+            return await this.handlePostTweet(args);
+          case 'search_tweets':
+            return await this.handleSearchTweets(args);
+            
+          // Account management operations
+          case 'get_profile':
+            return await this.handleGetProfile(args);
+          case 'update_profile':
+            return await this.handleUpdateProfile(args);
+          case 'follow_user':
+            return await this.handleFollowUser(args);
+          case 'unfollow_user':
+            return await this.handleUnfollowUser(args);
+          case 'list_followers':
+            return await this.handleListFollowers(args);
+          case 'list_following':
+            return await this.handleListFollowing(args);
+          case 'create_list':
+            return await this.handleCreateList(args);
+          case 'get_list_info':
+            return await this.handleGetListInfo(args);
+          case 'get_user_lists':
+            return await this.handleGetUserLists(args);
+          default:
+            throw new McpError(
+              ErrorCode.MethodNotFound,
+              `Unknown tool: ${name}`
+            );
+        }
+      } catch (error) {
+        return this.handleError(error);
+      }
+    });
+  }
+
+  // Tweet operations handlers
+  private async handlePostTweet(args: unknown) {
+    const result = PostTweetSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const tweet = await this.client.postTweet(result.data.text);
+    return {
+      content: [{
+        type: 'text',
+        text: `Tweet posted successfully!\nURL: https://twitter.com/status/${tweet.id}`
+      }] as TextContent[]
+    };
+  }
+
+  private async handleSearchTweets(args: unknown) {
+    const result = SearchTweetsSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const { tweets, users } = await this.client.searchTweets(
+      result.data.query,
+      result.data.count
+    );
+
+    const formattedResponse = ResponseFormatter.formatSearchResponse(
+      result.data.query,
+      tweets,
+      users
+    );
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  // Account management operations handlers
+  private async handleGetProfile(args: unknown) {
+    const result = GetProfileSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const profile = await this.client.getUserProfile(result.data.username);
+    const formattedResponse = ResponseFormatter.formatUserProfile(profile);
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleUpdateProfile(args: unknown) {
+    const result = UpdateProfileSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const updatedProfile = await this.client.updateProfile({
+      name: result.data.name,
+      description: result.data.description,
+      location: result.data.location,
+      url: result.data.url
+    });
+
+    const formattedResponse = `Profile updated successfully!\n\n${ResponseFormatter.formatUserProfile(updatedProfile)}`;
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleFollowUser(args: unknown) {
+    const result = FollowUserSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const user = await this.client.followUser(result.data.username);
+    const formattedResponse = `Successfully followed @${user.username}!\n\n${ResponseFormatter.formatUserProfile(user)}`;
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleUnfollowUser(args: unknown) {
+    const result = UnfollowUserSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const user = await this.client.unfollowUser(result.data.username);
+    const formattedResponse = `Successfully unfollowed @${user.username}!\n\n${ResponseFormatter.formatUserProfile(user)}`;
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleListFollowers(args: unknown) {
+    const result = ListFollowersSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const followers = await this.client.getFollowers(
+      result.data.username,
+      result.data.count
+    );
+
+    const formattedResponse = ResponseFormatter.formatUsersList(followers, 'followers');
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleListFollowing(args: unknown) {
+    const result = ListFollowingSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const following = await this.client.getFollowing(
+      result.data.username,
+      result.data.count
+    );
+
+    const formattedResponse = ResponseFormatter.formatUsersList(following, 'following');
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleCreateList(args: unknown) {
+    const result = CreateListSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const list = await this.client.createList(
+      result.data.name,
+      result.data.description,
+      result.data.private
+    );
+
+    const formattedResponse = `List "${list.name}" created successfully!\n\n${ResponseFormatter.formatListInfo(list)}`;
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleGetListInfo(args: unknown) {
+    const result = ListInfoSchema.safeParse(args);
+    if (!result.success) {
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        `Invalid parameters: ${result.error.message}`
+      );
+    }
+
+    const list = await this.client.getListInfo(result.data.listId);
+    const formattedResponse = ResponseFormatter.formatListInfo(list);
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private async handleGetUserLists(args: unknown) {
+    // No parameters needed for this endpoint
+    const lists = await this.client.getUserLists();
+    const formattedResponse = ResponseFormatter.formatLists(lists);
+
+    return {
+      content: [{
+        type: 'text',
+        text: ResponseFormatter.toMcpResponse(formattedResponse)
+      }] as TextContent[]
+    };
+  }
+
+  private handleError(error: unknown) {
+    if (error instanceof McpError) {
+      throw error;
+    }
+
+    if (error instanceof TwitterError) {
+      if (TwitterError.isRateLimit(error)) {
+        return {
+          content: [{
+            type: 'text',
+            text: 'Rate limit exceeded. Please wait a moment before trying again.',
+            isError: true
+          }] as TextContent[]
+        };
+      }
+
+      return {
+        content: [{
+          type: 'text',
+          text: `Twitter API error: ${(error as TwitterError).message}`,
+          isError: true
+        }] as TextContent[]
+      };
+    }
+
+    console.error('Unexpected error:', error);
+    throw new McpError(
+      ErrorCode.InternalError,
+      'An unexpected error occurred'
+    );
+  }
+
+  async start(): Promise<void> {
+    const transport = new StdioServerTransport();
+    await this.server.connect(transport);
+    console.error('Twitter MCP server running on stdio');
+  }
+}
+
+// Start the server
+dotenv.config();
+
+const config = {
+  apiKey: process.env.TWITTER_API_KEY!,
+  apiSecretKey: process.env.TWITTER_API_SECRET!,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN!,
+  accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!
+};
+
+const server = new TwitterServer(config);
+server.start().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
