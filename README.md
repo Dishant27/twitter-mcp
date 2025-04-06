@@ -1,6 +1,6 @@
 # Twitter MCP Server
 
-This MCP server allows Clients to interact with Twitter, enabling posting tweets and searching Twitter.
+This MCP server allows Clients to interact with Twitter, enabling comprehensive Twitter operations including posting tweets, searching Twitter, managing accounts, and organizing lists.
 
 ## Quick Start
 
@@ -39,7 +39,7 @@ To use this server with Claude, you'll need to set up the MCP configuration. Her
 {
   "name": "twitter",
   "display_name": "Twitter",
-  "description": "Twitter MCP allows Claude to post tweets and search Twitter",
+  "description": "Twitter MCP allows Claude to interact with Twitter",
   "path": "path/to/twitter-mcp/dist/index.js",
   "startup": {
     "env": {
@@ -60,13 +60,43 @@ Save this configuration in your Claude MCP config directory, typically located a
 
 ## Features
 
-- Post tweets with text
-- Search for tweets by query
+### Tweet Operations
+- Post tweets with text content (up to 280 characters)
+- Search for tweets by query with customizable result count
+
+### Account Management
+- Get profile information for any user or the authenticated account
+- Update profile details (name, bio, location, website URL)
+- Follow and unfollow Twitter users
+- List followers for any user or the authenticated account
+- List accounts that a user is following
+
+### List Management
+- Create new Twitter lists (public or private)
+- Get information about specific Twitter lists
+- Retrieve all lists owned by the authenticated user
+
+## Available MCP Tools
+
+| Tool Name | Description |
+|-----------|-------------|
+| `post_tweet` | Post a new tweet to Twitter |
+| `search_tweets` | Search for tweets on Twitter |
+| `get_profile` | Get Twitter profile information for a user or the authenticated account |
+| `update_profile` | Update the authenticated user's Twitter profile |
+| `follow_user` | Follow a Twitter user |
+| `unfollow_user` | Unfollow a Twitter user |
+| `list_followers` | List followers of a Twitter user or the authenticated account |
+| `list_following` | List accounts that a Twitter user or the authenticated account is following |
+| `create_list` | Create a new Twitter list |
+| `get_list_info` | Get information about a Twitter list |
+| `get_user_lists` | Get all lists owned by the authenticated user |
 
 ## Requirements
 
 - Node.js 18.x or higher
 - Twitter Developer account with API keys
+- Twitter API v1 and v2 access
 
 ## Environment Variables
 
@@ -85,6 +115,10 @@ twitter-mcp/
 │   └── workflows/
 │       ├── publish.yml
 │       └── release.yml
+├── code/
+│   ├── account_management.py  # Sample Python code for account management
+│   ├── post_tweet.py          # Sample Python code for posting tweets
+│   └── retrieve_tweets.py     # Sample Python code for retrieving tweets
 ├── src/
 │   ├── index.ts        # Main entry point
 │   ├── twitter-api.ts  # Twitter API client
