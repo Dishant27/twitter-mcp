@@ -41,8 +41,8 @@ export class TwitterClient {
       const tweets: Tweet[] = result.data.data.map(tweet => ({
         id: tweet.id,
         text: tweet.text,
-        authorId: tweet.author_id,
-        createdAt: tweet.created_at,
+        authorId: tweet.author_id || '',
+        createdAt: tweet.created_at || '',
         publicMetrics: {
           retweetCount: tweet.public_metrics?.retweet_count || 0,
           replyCount: tweet.public_metrics?.reply_count || 0,
@@ -120,7 +120,7 @@ export class TwitterClient {
         id: result.id_str,
         name: result.name,
         username: result.screen_name,
-        description: result.description,
+        description: result.description || undefined,
         profileImageUrl: result.profile_image_url_https,
         verified: result.verified,
         followersCount: result.followers_count,
@@ -138,8 +138,11 @@ export class TwitterClient {
    */
   async followUser(username: string): Promise<TwitterUser> {
     try {
+      const currentUserId = await this.getCurrentUserId();
+      const targetUserId = await this.getUserIdByUsername(username);
       const result = await this.client.v2.follow(
-        await this.getUserIdByUsername(username)
+        currentUserId,
+        targetUserId
       );
 
       if (!result.data.following) {
@@ -158,8 +161,11 @@ export class TwitterClient {
    */
   async unfollowUser(username: string): Promise<TwitterUser> {
     try {
+      const currentUserId = await this.getCurrentUserId();
+      const targetUserId = await this.getUserIdByUsername(username);
       const result = await this.client.v2.unfollow(
-        await this.getUserIdByUsername(username)
+        currentUserId,
+        targetUserId
       );
 
       if (!result.data.following) {
@@ -245,14 +251,20 @@ export class TwitterClient {
         description,
         private: isPrivate,
       });
+      const listData = result.data as {
+        id: string;
+        name: string;
+        description?: string;
+        private?: boolean;
+      };
 
       return {
-        id: result.data.id,
-        name: result.data.name,
-        description: result.data.description || '',
+        id: listData.id,
+        name: listData.name,
+        description: listData.description || '',
         memberCount: 0,
         followerCount: 0,
-        private: result.data.private || false,
+        private: listData.private || false,
         ownerId: await this.getCurrentUserId(),
       };
     } catch (error) {
@@ -294,8 +306,23 @@ export class TwitterClient {
       const result = await this.client.v2.listsOwned(userId, {
         'list.fields': 'follower_count,member_count,owner_id,private',
       });
+      type TwitterListPayload = {
+        id: string;
+        name: string;
+        description?: string;
+        member_count?: number;
+        follower_count?: number;
+        private?: boolean;
+        owner_id?: string;
+      };
+      const listResult = result.data as unknown as {
+        data?: TwitterListPayload[];
+      };
+      const lists = Array.isArray(result.data)
+        ? result.data as unknown as TwitterListPayload[]
+        : listResult.data || [];
 
-      return result.data.map(list => ({
+      return lists.map(list => ({
         id: list.id,
         name: list.name,
         description: list.description || '',

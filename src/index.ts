@@ -20,11 +20,17 @@ import {
   CreateListSchema, ListInfoSchema,
   TwitterError
 } from './types.js';
+import {
+  XQUIK_SEARCH_TOOL,
+  XquikClient,
+  handleXquikSearch
+} from './xquik-api.js';
 import dotenv from 'dotenv';
 
 export class TwitterServer {
   private server: Server;
   private client: TwitterClient;
+  private xquikClient?: XquikClient;
 
   constructor(config: Config) {
     // Validate config
@@ -34,6 +40,9 @@ export class TwitterServer {
     }
 
     this.client = new TwitterClient(config);
+    if (config.xquikApiKey) {
+      this.xquikClient = new XquikClient(config.xquikApiKey);
+    }
     this.server = new Server({
       name: 'twitter-mcp',
       version: '1.0.0'
@@ -103,6 +112,7 @@ export class TwitterServer {
             required: ['query', 'count']
           }
         } as Tool,
+        XQUIK_SEARCH_TOOL,
         
         // Account management operations
         {
@@ -275,6 +285,8 @@ export class TwitterServer {
             return await this.handlePostTweet(args);
           case 'search_tweets':
             return await this.handleSearchTweets(args);
+          case 'xquik_search_tweets':
+            return await handleXquikSearch(this.xquikClient, args);
             
           // Account management operations
           case 'get_profile':
@@ -593,7 +605,8 @@ const config = {
   apiKey: process.env.TWITTER_API_KEY!,
   apiSecretKey: process.env.TWITTER_API_SECRET!,
   accessToken: process.env.TWITTER_ACCESS_TOKEN!,
-  accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!
+  accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!,
+  xquikApiKey: process.env.XQUIK_API_KEY
 };
 
 const server = new TwitterServer(config);

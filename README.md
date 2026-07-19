@@ -31,6 +31,19 @@ npm start
 
 6. Use with a MCP client, such as Claude.
 
+### Optional Xquik Search
+
+Set `XQUIK_API_KEY` to enable `xquik_search_tweets` through
+[Xquik](https://docs.xquik.com/api-reference/overview). The existing X API
+tools keep using the credentials above.
+
+```bash
+XQUIK_API_KEY=your_xquik_api_key npm start
+```
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ## Claude Configuration
 
 To use this server with Claude, you'll need to set up the MCP configuration. Here's an example of how the configuration structure should look:
@@ -82,6 +95,7 @@ Save this configuration in your Claude MCP config directory, typically located a
 |-----------|-------------|
 | `post_tweet` | Post new content to X |
 | `search_tweets` | Search for content on X |
+| `xquik_search_tweets` | Search X posts through optional Xquik access |
 | `get_profile` | Get profile information for a user or the authenticated account |
 | `update_profile` | Update the authenticated user's profile |
 | `follow_user` | Follow a user |
@@ -106,6 +120,7 @@ Save this configuration in your Claude MCP config directory, typically located a
 | `TWITTER_API_SECRET` | Your API secret |
 | `TWITTER_ACCESS_TOKEN` | Your access token |
 | `TWITTER_ACCESS_TOKEN_SECRET` | Your access token secret |
+| `XQUIK_API_KEY` | Optional Xquik API key for `xquik_search_tweets` |
 
 ## Repository Structure
 
@@ -136,3 +151,9 @@ twitter-mcp/
 ## License
 
 MIT
+
+## Tests
+
+```bash
+npm test
+```
