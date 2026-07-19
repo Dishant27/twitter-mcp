@@ -6,6 +6,7 @@ export const ConfigSchema = z.object({
   apiSecretKey: z.string(),
   accessToken: z.string(),
   accessTokenSecret: z.string(),
+  xquikApiKey: z.string().optional(),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;
@@ -34,6 +35,15 @@ export const PostTweetSchema = z.object({
 export const SearchTweetsSchema = z.object({
   query: z.string(),
   count: z.number().min(10).max(100),
+});
+
+export const XquikSearchSchema = z.object({
+  query: z.string().min(1),
+  count: z.number().min(1).max(100).default(10),
+  queryType: z.enum(['Latest', 'Top']).default('Latest'),
+  cursor: z.string().optional(),
+  sinceTime: z.string().optional(),
+  untilTime: z.string().optional(),
 });
 
 // Account Management Schemas
