@@ -5,9 +5,9 @@ This MCP server allows Clients to interact with X (formerly Twitter), enabling c
 ## Quick Start
 
 1. Create an X Developer account and get your API keys from [X Developer Portal](https://developer.twitter.com/en/portal/dashboard)
-2. Set all required API keys in the environment variables
-3. Clone this repository: `git clone https://github.com/Dishant27/twitter-mcp.git`
-4. Install dependencies: `npm install`
+2. Clone this repository: `git clone https://github.com/Dishant27/twitter-mcp.git`
+3. Install dependencies and build: `npm install && npm run build`
+4. Set your API keys, either as environment variables or in a `.env` file (copy `.env.example` to `.env` and fill in your values; `.env` is git-ignored, so never commit it)
 5. Run the server:
 - With environment variables:
 ```bash
@@ -19,13 +19,8 @@ npm start
 ```
 - Using a `.env` file:
 ```bash
-# Create a .env file with your X API keys
-echo "TWITTER_API_KEY=your_api_key
-TWITTER_API_SECRET=your_api_secret
-TWITTER_ACCESS_TOKEN=your_access_token
-TWITTER_ACCESS_TOKEN_SECRET=your_access_token_secret" > .env
-
-# Start the server
+cp .env.example .env
+# edit .env with your own keys, then:
 npm start
 ```
 
@@ -98,6 +93,8 @@ Save this configuration in your Claude MCP config directory, typically located a
 - X Developer account with API keys
 - API v1 and v2 access
 
+Built on `@modelcontextprotocol/sdk` 1.x (the `McpServer` / `registerTool` API with zod input schemas). It runs over stdio, so stdout is reserved for the MCP protocol and all logs go to stderr.
+
 ## Environment Variables
 
 | Variable | Description |
@@ -107,28 +104,40 @@ Save this configuration in your Claude MCP config directory, typically located a
 | `TWITTER_ACCESS_TOKEN` | Your access token |
 | `TWITTER_ACCESS_TOKEN_SECRET` | Your access token secret |
 
+All four are required; the server exits at startup if any is missing. See `.env.example`.
+
+## Development
+
+```bash
+npm run build   # compile TypeScript to dist/
+npm run smoke   # start the built server with placeholder keys and check it lists its 11 tools (no X API calls)
+```
+
+CI (`.github/workflows/ci.yml`) runs `npm ci`, a type check, the build and the smoke test on pushes and pull requests to `master`.
+
 ## Repository Structure
 
 ```
 twitter-mcp/
 ├── .github/
 │   └── workflows/
-│       ├── publish.yml
-│       └── release.yml
+│       └── ci.yml      # Build + smoke test
 ├── code/
 │   ├── account_management.py  # Sample Python code for account management
 │   ├── post_tweet.py          # Sample Python code for posting content
 │   └── retrieve_tweets.py     # Sample Python code for retrieving content
 ├── src/
-│   ├── index.ts        # Main entry point
+│   ├── index.ts        # Main entry point (MCP server and tools)
 │   ├── twitter-api.ts  # X API client
 │   ├── formatter.ts    # Response formatter
 │   └── types.ts        # Type definitions
+├── test/
+│   └── smoke.mjs       # Stdio smoke test
 ├── .env.example
 ├── .gitignore
-├── Dockerfile
 ├── LICENSE
 ├── package.json
+├── package-lock.json
 ├── README.md
 └── tsconfig.json
 ```

@@ -1,4 +1,4 @@
-import { Tweet, TwitterUser, TwitterList } from './types';
+import { Tweet, TwitterUser, TwitterList } from './types.js';
 
 export class ResponseFormatter {
   /**

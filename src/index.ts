@@ -1,582 +1,260 @@
 #!/usr/bin/env node
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+/**
+ * X (Twitter) MCP server
+ *
+ * Stdio MCP server: stdout carries the JSON-RPC protocol, so all logging goes
+ * to stderr (console.error). Never write to stdout from this process.
+ */
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  ListToolsRequestSchema,
-  CallToolRequestSchema,
-  Tool,
-  ErrorCode,
-  McpError,
-  TextContent
-} from '@modelcontextprotocol/sdk/types.js';
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { z } from 'zod';
+import dotenv from 'dotenv';
 import { TwitterClient } from './twitter-api.js';
 import { ResponseFormatter } from './formatter.js';
-import {
-  Config, ConfigSchema,
-  PostTweetSchema, SearchTweetsSchema,
-  GetProfileSchema, UpdateProfileSchema,
-  FollowUserSchema, UnfollowUserSchema,
-  ListFollowersSchema, ListFollowingSchema,
-  CreateListSchema, ListInfoSchema,
-  TwitterError
-} from './types.js';
-import dotenv from 'dotenv';
+import { Config, ConfigSchema, TwitterError } from './types.js';
+
+function text(body: string): CallToolResult {
+  return { content: [{ type: 'text', text: ResponseFormatter.toMcpResponse(body) }] };
+}
 
 export class TwitterServer {
-  private server: Server;
+  private server: McpServer;
   private client: TwitterClient;
 
   constructor(config: Config) {
-    // Validate config
     const result = ConfigSchema.safeParse(config);
     if (!result.success) {
-      throw new Error(`Invalid configuration: ${result.error.message}`);
+      // Only report which fields are missing/invalid; never echo values.
+      const fields = result.error.issues.map(i => i.path.join('.')).join(', ');
+      throw new Error(`Invalid configuration: missing or invalid ${fields}`);
     }
 
-    this.client = new TwitterClient(config);
-    this.server = new Server({
-      name: 'twitter-mcp',
-      version: '1.0.0'
-    }, {
-      capabilities: {
-        tools: {}
-      }
-    });
+    this.client = new TwitterClient(result.data);
+    this.server = new McpServer(
+      { name: 'twitter-mcp', version: '1.1.0' },
+      { capabilities: { tools: {} } }
+    );
 
-    this.setupHandlers();
-  }
-
-  private setupHandlers(): void {
-    // Error handler
-    this.server.onerror = (error) => {
-      console.error('[MCP Error]:', error);
+    this.server.server.onerror = (error) => {
+      console.error('[MCP Error]:', error instanceof Error ? error.message : error);
     };
 
-    // Graceful shutdown
     process.on('SIGINT', async () => {
       console.error('Shutting down server...');
       await this.server.close();
       process.exit(0);
     });
 
-    // Register tool handlers
-    this.setupToolHandlers();
+    this.registerTools();
   }
 
-  private setupToolHandlers(): void {
-    // List available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
-      tools: [
-        // Tweet operations
-        {
-          name: 'post_tweet',
-          description: 'Post a new tweet to Twitter',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              text: {
-                type: 'string',
-                description: 'The content of your tweet',
-                maxLength: 280
-              }
-            },
-            required: ['text']
-          }
-        } as Tool,
-        {
-          name: 'search_tweets',
-          description: 'Search for tweets on Twitter',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              query: {
-                type: 'string',
-                description: 'Search query'
-              },
-              count: {
-                type: 'number',
-                description: 'Number of tweets to return (10-100)',
-                minimum: 10,
-                maximum: 100
-              }
-            },
-            required: ['query', 'count']
-          }
-        } as Tool,
-        
-        // Account management operations
-        {
-          name: 'get_profile',
-          description: 'Get Twitter profile information for a user or the authenticated account',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              username: {
-                type: 'string',
-                description: 'Twitter username (if not provided, returns authenticated user profile)'
-              }
-            },
-            required: []
-          }
-        } as Tool,
-        {
-          name: 'update_profile',
-          description: 'Update the authenticated user\'s Twitter profile',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              name: {
-                type: 'string',
-                description: 'Display name (max 50 chars)'
-              },
-              description: {
-                type: 'string',
-                description: 'Bio (max 160 chars)'
-              },
-              location: {
-                type: 'string',
-                description: 'Location (max 30 chars)'
-              },
-              url: {
-                type: 'string',
-                description: 'Website URL (max 100 chars)'
-              }
-            },
-            required: []
-          }
-        } as Tool,
-        {
-          name: 'follow_user',
-          description: 'Follow a Twitter user',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              username: {
-                type: 'string',
-                description: 'Twitter username to follow'
-              }
-            },
-            required: ['username']
-          }
-        } as Tool,
-        {
-          name: 'unfollow_user',
-          description: 'Unfollow a Twitter user',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              username: {
-                type: 'string',
-                description: 'Twitter username to unfollow'
-              }
-            },
-            required: ['username']
-          }
-        } as Tool,
-        {
-          name: 'list_followers',
-          description: 'List followers of a Twitter user or the authenticated account',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              username: {
-                type: 'string',
-                description: 'Twitter username (if not provided, returns authenticated user\'s followers)'
-              },
-              count: {
-                type: 'number',
-                description: 'Number of followers to return (1-200)',
-                minimum: 1,
-                maximum: 200,
-                default: 20
-              }
-            },
-            required: []
-          }
-        } as Tool,
-        {
-          name: 'list_following',
-          description: 'List accounts that a Twitter user or the authenticated account is following',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              username: {
-                type: 'string',
-                description: 'Twitter username (if not provided, returns authenticated user\'s following)'
-              },
-              count: {
-                type: 'number',
-                description: 'Number of accounts to return (1-200)',
-                minimum: 1,
-                maximum: 200,
-                default: 20
-              }
-            },
-            required: []
-          }
-        } as Tool,
-        {
-          name: 'create_list',
-          description: 'Create a new Twitter list',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              name: {
-                type: 'string',
-                description: 'List name (max 25 chars)'
-              },
-              description: {
-                type: 'string',
-                description: 'List description (max 100 chars)'
-              },
-              private: {
-                type: 'boolean',
-                description: 'Whether the list should be private (default: false)'
-              }
-            },
-            required: ['name']
-          }
-        } as Tool,
-        {
-          name: 'get_list_info',
-          description: 'Get information about a Twitter list',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              listId: {
-                type: 'string',
-                description: 'Twitter list ID'
-              }
-            },
-            required: ['listId']
-          }
-        } as Tool,
-        {
-          name: 'get_user_lists',
-          description: 'Get all lists owned by the authenticated user',
-          inputSchema: {
-            type: 'object',
-            properties: {},
-            required: []
-          }
-        } as Tool
-      ]
-    }));
+  /** Run a tool body, logging the tool name and mapping errors to tool results. */
+  private async run(name: string, fn: () => Promise<CallToolResult>): Promise<CallToolResult> {
+    console.error(`Tool called: ${name}`);
+    try {
+      return await fn();
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 
-    // Handle tool execution
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
-      console.error(`Tool called: ${name}`, args);
-
-      try {
-        switch (name) {
-          // Tweet operations
-          case 'post_tweet':
-            return await this.handlePostTweet(args);
-          case 'search_tweets':
-            return await this.handleSearchTweets(args);
-            
-          // Account management operations
-          case 'get_profile':
-            return await this.handleGetProfile(args);
-          case 'update_profile':
-            return await this.handleUpdateProfile(args);
-          case 'follow_user':
-            return await this.handleFollowUser(args);
-          case 'unfollow_user':
-            return await this.handleUnfollowUser(args);
-          case 'list_followers':
-            return await this.handleListFollowers(args);
-          case 'list_following':
-            return await this.handleListFollowing(args);
-          case 'create_list':
-            return await this.handleCreateList(args);
-          case 'get_list_info':
-            return await this.handleGetListInfo(args);
-          case 'get_user_lists':
-            return await this.handleGetUserLists(args);
-          default:
-            throw new McpError(
-              ErrorCode.MethodNotFound,
-              `Unknown tool: ${name}`
-            );
+  private registerTools(): void {
+    // Tweet operations
+    this.server.registerTool(
+      'post_tweet',
+      {
+        description: 'Post a new tweet to Twitter',
+        inputSchema: {
+          text: z.string().max(280).describe('The content of your tweet')
         }
-      } catch (error) {
-        return this.handleError(error);
-      }
-    });
-  }
-
-  // Tweet operations handlers
-  private async handlePostTweet(args: unknown) {
-    const result = PostTweetSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const tweet = await this.client.postTweet(result.data.text);
-    return {
-      content: [{
-        type: 'text',
-        text: `Tweet posted successfully!\nURL: https://twitter.com/status/${tweet.id}`
-      }] as TextContent[]
-    };
-  }
-
-  private async handleSearchTweets(args: unknown) {
-    const result = SearchTweetsSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const { tweets, users } = await this.client.searchTweets(
-      result.data.query,
-      result.data.count
+      },
+      async ({ text: body }) => this.run('post_tweet', async () => {
+        const tweet = await this.client.postTweet(body);
+        return text(`Tweet posted successfully!\nURL: https://twitter.com/status/${tweet.id}`);
+      })
     );
 
-    const formattedResponse = ResponseFormatter.formatSearchResponse(
-      result.data.query,
-      tweets,
-      users
+    this.server.registerTool(
+      'search_tweets',
+      {
+        description: 'Search for tweets on Twitter',
+        inputSchema: {
+          query: z.string().describe('Search query'),
+          count: z.number().min(10).max(100).describe('Number of tweets to return (10-100)')
+        }
+      },
+      async ({ query, count }) => this.run('search_tweets', async () => {
+        const { tweets, users } = await this.client.searchTweets(query, count);
+        return text(ResponseFormatter.formatSearchResponse(query, tweets, users));
+      })
     );
 
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  // Account management operations handlers
-  private async handleGetProfile(args: unknown) {
-    const result = GetProfileSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const profile = await this.client.getUserProfile(result.data.username);
-    const formattedResponse = ResponseFormatter.formatUserProfile(profile);
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleUpdateProfile(args: unknown) {
-    const result = UpdateProfileSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const updatedProfile = await this.client.updateProfile({
-      name: result.data.name,
-      description: result.data.description,
-      location: result.data.location,
-      url: result.data.url
-    });
-
-    const formattedResponse = `Profile updated successfully!\n\n${ResponseFormatter.formatUserProfile(updatedProfile)}`;
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleFollowUser(args: unknown) {
-    const result = FollowUserSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const user = await this.client.followUser(result.data.username);
-    const formattedResponse = `Successfully followed @${user.username}!\n\n${ResponseFormatter.formatUserProfile(user)}`;
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleUnfollowUser(args: unknown) {
-    const result = UnfollowUserSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const user = await this.client.unfollowUser(result.data.username);
-    const formattedResponse = `Successfully unfollowed @${user.username}!\n\n${ResponseFormatter.formatUserProfile(user)}`;
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleListFollowers(args: unknown) {
-    const result = ListFollowersSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const followers = await this.client.getFollowers(
-      result.data.username,
-      result.data.count
+    // Account management operations
+    this.server.registerTool(
+      'get_profile',
+      {
+        description: 'Get Twitter profile information for a user or the authenticated account',
+        inputSchema: {
+          username: z.string().optional()
+            .describe('Twitter username (if not provided, returns authenticated user profile)')
+        }
+      },
+      async ({ username }) => this.run('get_profile', async () => {
+        const profile = await this.client.getUserProfile(username);
+        return text(ResponseFormatter.formatUserProfile(profile));
+      })
     );
 
-    const formattedResponse = ResponseFormatter.formatUsersList(followers, 'followers');
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleListFollowing(args: unknown) {
-    const result = ListFollowingSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const following = await this.client.getFollowing(
-      result.data.username,
-      result.data.count
+    this.server.registerTool(
+      'update_profile',
+      {
+        description: 'Update the authenticated user\'s Twitter profile',
+        inputSchema: {
+          name: z.string().max(50).optional().describe('Display name (max 50 chars)'),
+          description: z.string().max(160).optional().describe('Bio (max 160 chars)'),
+          location: z.string().max(30).optional().describe('Location (max 30 chars)'),
+          url: z.string().url().max(100).optional().describe('Website URL (max 100 chars)')
+        }
+      },
+      async (args) => this.run('update_profile', async () => {
+        const { name, description, location, url } = args;
+        if ([name, description, location, url].every(v => v === undefined)) {
+          return {
+            isError: true,
+            content: [{ type: 'text', text: 'Invalid parameters: At least one profile field must be provided' }]
+          };
+        }
+        const updated = await this.client.updateProfile({ name, description, location, url });
+        return text(`Profile updated successfully!\n\n${ResponseFormatter.formatUserProfile(updated)}`);
+      })
     );
 
-    const formattedResponse = ResponseFormatter.formatUsersList(following, 'following');
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleCreateList(args: unknown) {
-    const result = CreateListSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const list = await this.client.createList(
-      result.data.name,
-      result.data.description,
-      result.data.private
+    this.server.registerTool(
+      'follow_user',
+      {
+        description: 'Follow a Twitter user',
+        inputSchema: {
+          username: z.string().describe('Twitter username to follow')
+        }
+      },
+      async ({ username }) => this.run('follow_user', async () => {
+        const user = await this.client.followUser(username);
+        return text(`Successfully followed @${user.username}!\n\n${ResponseFormatter.formatUserProfile(user)}`);
+      })
     );
 
-    const formattedResponse = `List "${list.name}" created successfully!\n\n${ResponseFormatter.formatListInfo(list)}`;
+    this.server.registerTool(
+      'unfollow_user',
+      {
+        description: 'Unfollow a Twitter user',
+        inputSchema: {
+          username: z.string().describe('Twitter username to unfollow')
+        }
+      },
+      async ({ username }) => this.run('unfollow_user', async () => {
+        const user = await this.client.unfollowUser(username);
+        return text(`Successfully unfollowed @${user.username}!\n\n${ResponseFormatter.formatUserProfile(user)}`);
+      })
+    );
 
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
+    this.server.registerTool(
+      'list_followers',
+      {
+        description: 'List followers of a Twitter user or the authenticated account',
+        inputSchema: {
+          username: z.string().optional()
+            .describe('Twitter username (if not provided, returns authenticated user\'s followers)'),
+          count: z.number().min(1).max(200).default(20)
+            .describe('Number of followers to return (1-200)')
+        }
+      },
+      async ({ username, count }) => this.run('list_followers', async () => {
+        const followers = await this.client.getFollowers(username, count);
+        return text(ResponseFormatter.formatUsersList(followers, 'followers'));
+      })
+    );
+
+    this.server.registerTool(
+      'list_following',
+      {
+        description: 'List accounts that a Twitter user or the authenticated account is following',
+        inputSchema: {
+          username: z.string().optional()
+            .describe('Twitter username (if not provided, returns authenticated user\'s following)'),
+          count: z.number().min(1).max(200).default(20)
+            .describe('Number of accounts to return (1-200)')
+        }
+      },
+      async ({ username, count }) => this.run('list_following', async () => {
+        const following = await this.client.getFollowing(username, count);
+        return text(ResponseFormatter.formatUsersList(following, 'following'));
+      })
+    );
+
+    // List operations
+    this.server.registerTool(
+      'create_list',
+      {
+        description: 'Create a new Twitter list',
+        inputSchema: {
+          name: z.string().max(25).describe('List name (max 25 chars)'),
+          description: z.string().max(100).optional().describe('List description (max 100 chars)'),
+          private: z.boolean().default(false).describe('Whether the list should be private (default: false)')
+        }
+      },
+      async ({ name, description, private: isPrivate }) => this.run('create_list', async () => {
+        const list = await this.client.createList(name, description, isPrivate);
+        return text(`List "${list.name}" created successfully!\n\n${ResponseFormatter.formatListInfo(list)}`);
+      })
+    );
+
+    this.server.registerTool(
+      'get_list_info',
+      {
+        description: 'Get information about a Twitter list',
+        inputSchema: {
+          listId: z.string().describe('Twitter list ID')
+        }
+      },
+      async ({ listId }) => this.run('get_list_info', async () => {
+        const list = await this.client.getListInfo(listId);
+        return text(ResponseFormatter.formatListInfo(list));
+      })
+    );
+
+    this.server.registerTool(
+      'get_user_lists',
+      {
+        description: 'Get all lists owned by the authenticated user',
+        inputSchema: {}
+      },
+      async () => this.run('get_user_lists', async () => {
+        const lists = await this.client.getUserLists();
+        return text(ResponseFormatter.formatLists(lists));
+      })
+    );
   }
 
-  private async handleGetListInfo(args: unknown) {
-    const result = ListInfoSchema.safeParse(args);
-    if (!result.success) {
-      throw new McpError(
-        ErrorCode.InvalidParams,
-        `Invalid parameters: ${result.error.message}`
-      );
-    }
-
-    const list = await this.client.getListInfo(result.data.listId);
-    const formattedResponse = ResponseFormatter.formatListInfo(list);
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private async handleGetUserLists(args: unknown) {
-    // No parameters needed for this endpoint
-    const lists = await this.client.getUserLists();
-    const formattedResponse = ResponseFormatter.formatLists(lists);
-
-    return {
-      content: [{
-        type: 'text',
-        text: ResponseFormatter.toMcpResponse(formattedResponse)
-      }] as TextContent[]
-    };
-  }
-
-  private handleError(error: unknown) {
-    if (error instanceof McpError) {
-      throw error;
-    }
-
+  private handleError(error: unknown): CallToolResult {
     if (error instanceof TwitterError) {
       if (TwitterError.isRateLimit(error)) {
         return {
-          content: [{
-            type: 'text',
-            text: 'Rate limit exceeded. Please wait a moment before trying again.',
-            isError: true
-          }] as TextContent[]
+          isError: true,
+          content: [{ type: 'text', text: 'Rate limit exceeded. Please wait a moment before trying again.' }]
         };
       }
-
       return {
-        content: [{
-          type: 'text',
-          text: `Twitter API error: ${(error as TwitterError).message}`,
-          isError: true
-        }] as TextContent[]
+        isError: true,
+        content: [{ type: 'text', text: `Twitter API error: ${error.message}` }]
       };
     }
 
-    console.error('Unexpected error:', error);
-    throw new McpError(
-      ErrorCode.InternalError,
-      'An unexpected error occurred'
-    );
+    console.error('Unexpected error:', error instanceof Error ? error.message : String(error));
+    return {
+      isError: true,
+      content: [{ type: 'text', text: 'An unexpected error occurred' }]
+    };
   }
 
   async start(): Promise<void> {
@@ -590,14 +268,19 @@ export class TwitterServer {
 dotenv.config();
 
 const config = {
-  apiKey: process.env.TWITTER_API_KEY!,
-  apiSecretKey: process.env.TWITTER_API_SECRET!,
-  accessToken: process.env.TWITTER_ACCESS_TOKEN!,
-  accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET!
+  apiKey: process.env.TWITTER_API_KEY,
+  apiSecretKey: process.env.TWITTER_API_SECRET,
+  accessToken: process.env.TWITTER_ACCESS_TOKEN,
+  accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 };
 
-const server = new TwitterServer(config);
-server.start().catch(error => {
-  console.error('Failed to start server:', error);
+try {
+  const server = new TwitterServer(config as Config);
+  server.start().catch(error => {
+    console.error('Failed to start server:', error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+} catch (error) {
+  console.error('Failed to start server:', error instanceof Error ? error.message : error);
   process.exit(1);
-});
+}

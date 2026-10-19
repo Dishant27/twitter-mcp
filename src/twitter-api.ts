@@ -1,11 +1,11 @@
-import Twitter from 'twitter-api-v2';
-import { Config, TwitterError, TwitterUser, Tweet, TwitterList } from './types';
+import { TwitterApi } from 'twitter-api-v2';
+import { Config, TwitterError, TwitterUser, Tweet, TwitterList } from './types.js';
 
 export class TwitterClient {
-  private client: Twitter;
+  private client: TwitterApi;
 
   constructor(config: Config) {
-    this.client = new Twitter({
+    this.client = new TwitterApi({
       appKey: config.apiKey,
       appSecret: config.apiSecretKey,
       accessToken: config.accessToken,
@@ -38,11 +38,11 @@ export class TwitterClient {
         expansions: 'author_id',
       });
 
-      const tweets: Tweet[] = result.data.data.map(tweet => ({
+      const tweets: Tweet[] = (result.data.data ?? []).map(tweet => ({
         id: tweet.id,
         text: tweet.text,
-        authorId: tweet.author_id,
-        createdAt: tweet.created_at,
+        authorId: tweet.author_id ?? '',
+        createdAt: tweet.created_at ?? '',
         publicMetrics: {
           retweetCount: tweet.public_metrics?.retweet_count || 0,
           replyCount: tweet.public_metrics?.reply_count || 0,
@@ -120,7 +120,7 @@ export class TwitterClient {
         id: result.id_str,
         name: result.name,
         username: result.screen_name,
-        description: result.description,
+        description: result.description ?? undefined,
         profileImageUrl: result.profile_image_url_https,
         verified: result.verified,
         followersCount: result.followers_count,
@@ -138,7 +138,9 @@ export class TwitterClient {
    */
   async followUser(username: string): Promise<TwitterUser> {
     try {
+      // v2 follow endpoint takes (source user id, target user id)
       const result = await this.client.v2.follow(
+        await this.getCurrentUserId(),
         await this.getUserIdByUsername(username)
       );
 
@@ -158,7 +160,9 @@ export class TwitterClient {
    */
   async unfollowUser(username: string): Promise<TwitterUser> {
     try {
+      // v2 unfollow endpoint takes (source user id, target user id)
       const result = await this.client.v2.unfollow(
+        await this.getCurrentUserId(),
         await this.getUserIdByUsername(username)
       );
 
@@ -249,10 +253,11 @@ export class TwitterClient {
       return {
         id: result.data.id,
         name: result.data.name,
-        description: result.data.description || '',
+        // The create endpoint only returns id and name
+        description: description || '',
         memberCount: 0,
         followerCount: 0,
-        private: result.data.private || false,
+        private: isPrivate,
         ownerId: await this.getCurrentUserId(),
       };
     } catch (error) {
@@ -295,7 +300,7 @@ export class TwitterClient {
         'list.fields': 'follower_count,member_count,owner_id,private',
       });
 
-      return result.data.map(list => ({
+      return result.lists.map(list => ({
         id: list.id,
         name: list.name,
         description: list.description || '',
@@ -340,7 +345,17 @@ export class TwitterClient {
    * Error handler
    */
   private handleTwitterError(error: any): never {
-    console.error('Twitter API error:', error);
+    // Log only the code and message. The raw error object from twitter-api-v2
+    // includes the HTTP request (with its OAuth Authorization header), which
+    // must never end up in logs.
+    if (error instanceof TwitterError) {
+      throw error;
+    }
+    console.error(
+      'Twitter API error:',
+      error?.code ?? error?.errors?.[0]?.code ?? '',
+      error?.message ?? error?.errors?.[0]?.message ?? 'Unknown error'
+    );
     
     // Handle rate limiting
     if (error.code === 88 || (error.errors && error.errors[0]?.code === 88)) {
